@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Millet Brands Directory</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #faf7f2;
+    --card: #ffffff;
+    --accent: #c8773a;
+    --accent2: #4a7c59;
+    --text: #1a1a1a;
+    --muted: #7a7060;
+    --border: #e8e0d4;
+    --tag-rte: #4a7c59;
+    --tag-rtc: #c8773a;
+    --tag-rtd: #6b5b95;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  header {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2416 100%);
+    padding: 48px 32px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c8773a' fill-opacity='0.06'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 1;
+  }
+  header h1 { font-family: 'Playfair Display', serif; font-size: clamp(2rem,5vw,3.5rem); color: #f5ede0; letter-spacing: -1px; position: relative; }
+  header h1 span { color: var(--accent); }
+  header p { color: #a89880; font-size: 0.95rem; margin-top: 8px; position: relative; }
+
+  .controls {
+    max-width: 1200px;
+    margin: 28px auto 0;
+    padding: 0 20px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .search-wrap { position: relative; flex: 1; min-width: 200px; }
+  .search-wrap input {
+    width: 100%;
+    padding: 12px 16px 12px 44px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    background: var(--card);
+    font-family: inherit;
+    font-size: 0.95rem;
+    color: var(--text);
+    outline: none;
+    transition: border-color .2s;
+  }
+  .search-wrap input:focus { border-color: var(--accent); }
+  .search-wrap svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); opacity: .5; }
+
+  select {
+    padding: 12px 16px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    background: var(--card);
+    font-family: inherit;
+    font-size: 0.9rem;
+    color: var(--text);
+    outline: none;
+    cursor: pointer;
+    transition: border-color .2s;
+  }
+  select:focus { border-color: var(--accent); }
+
+  .count-bar {
+    max-width: 1200px;
+    margin: 16px auto 0;
+    padding: 0 20px;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  .count-bar strong { color: var(--accent); }
+
+  .grid {
+    max-width: 1200px;
+    margin: 20px auto 60px;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+    gap: 20px;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 22px;
+    transition: transform .2s, box-shadow .2s, border-color .2s;
+    animation: fadeUp .35s ease both;
+  }
+  .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(0,0,0,.09);
+    border-color: var(--accent);
+  }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
+  .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 12px; }
+  .sno { font-size: 0.7rem; font-weight: 500; color: var(--muted); background: var(--bg); border-radius: 4px; padding: 2px 7px; white-space: nowrap; }
+  .brand-name { font-family: 'Playfair Display', serif; font-size: 1.15rem; font-weight: 700; line-height: 1.3; color: var(--text); }
+
+  .hq { font-size: 0.82rem; color: var(--muted); margin-bottom: 12px; display: flex; align-items: center; gap: 5px; }
+
+  .products { font-size: 0.82rem; color: #444; margin-bottom: 14px; line-height: 1.6; }
+  .products strong { color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: .5px; display: block; margin-bottom: 4px; }
+
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+  .tag {
+    font-size: 0.7rem; font-weight: 500; padding: 3px 8px; border-radius: 5px; letter-spacing: .3px;
+  }
+  .tag-RTE { background: #e8f5ee; color: var(--tag-rte); border: 1px solid #b8dfc7; }
+  .tag-RTC { background: #fdf0e6; color: var(--tag-rtc); border: 1px solid #f0c89a; }
+  .tag-RTD { background: #f0edf8; color: var(--tag-rtd); border: 1px solid #ccc0e8; }
+
+  .platforms { display: flex; flex-wrap: wrap; gap: 5px; }
+  .plat {
+    font-size: 0.7rem; padding: 3px 9px; border-radius: 20px; font-weight: 500;
+    background: var(--bg); color: var(--muted); border: 1px solid var(--border);
+  }
+  .plat-bb { background: #fff3e0; color: #e65100; border-color: #ffcc80; }
+  .plat-bk { background: #e8f5e9; color: #2e7d32; border-color: #a5d6a7; }
+  .plat-zp { background: #fce4ec; color: #c2185b; border-color: #f48fb1; }
+  .plat-si { background: #fff8e1; color: #f57f17; border-color: #ffe082; }
+  .plat-jm { background: #e3f2fd; color: #1565c0; border-color: #90caf9; }
+  .plat-am { background: #fafafa; color: #212121; border-color: #bdbdbd; }
+  .plat-d2c { background: #f3e5f5; color: #6a1b9a; border-color: #ce93d8; }
+
+  .no-results { grid-column: 1/-1; text-align: center; padding: 60px 20px; color: var(--muted); }
+  .no-results svg { opacity: .3; margin-bottom: 16px; }
+  .no-results p { font-size: 1.1rem; }
+
+  footer { text-align: center; padding: 24px; color: var(--muted); font-size: 0.8rem; border-top: 1px solid var(--border); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🌾 Millet Brands <span>Directory</span></h1>
+  <p>India's comprehensive millet product ecosystem · Quick-commerce & online platforms</p>
+</header>
+
+<div class="controls">
+  <div class="search-wrap">
+    <svg width="16" height="16" fill="none" stroke="#666" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" id="search" placeholder="Search brand, product, location…" oninput="filter()">
+  </div>
+  <select id="platform" onchange="filter()">
+    <option value="">All Platforms</option>
+    <option>BigBasket</option>
+    <option>Blinkit</option>
+    <option>Zepto</option>
+    <option>Swiggy Instamart</option>
+    <option>JioMart</option>
+    <option>Amazon</option>
+    <option>D2C</option>
+  </select>
+  <select id="type" onchange="filter()">
+    <option value="">All Types</option>
+    <option value="RTE">RTE – Ready to Eat</option>
+    <option value="RTC">RTC – Ready to Cook</option>
+    <option value="RTD">RTD – Ready to Drink</option>
+  </select>
+</div>
+<div class="count-bar"><span id="countLabel">Loading…</span></div>
+
+<div class="grid" id="grid"></div>
+<footer>Millet Brands Directory · India · Data compiled 2024–25</footer>
+
+<script>
+const brands = [
+  {sno:1,name:"Tata Consumer Soulfull",hq:"Bidadi, Bengaluru, Karnataka",products:"Millet Muesli, Ragi Bites, Millet Smoothix, Oats+Millets Cereal, Ragi Choco Sticks, Cream Wafers, Masala Oats+Millet",types:["RTE","RTC","RTD"],platforms:["BigBasket","Blinkit","Zepto","Swiggy Instamart"]},
+  {sno:2,name:"Sresta Natural Bioproducts (24 Mantra)",hq:"Banjara Hills, Hyderabad, Telangana",products:"Organic Foxtail/Little/Kodo/Barnyard/Finger/Pearl/Jowar Millet, Ragi Flour, Ragi Dosa Mix, Millet Idly Mix, Multi-Millet Atta",types:["RTC"],platforms:["BigBasket","Blinkit","Zepto","Swiggy Instamart","JioMart"]},
+  {sno:3,name:"Wholsum Foods (Slurrp Farm)",hq:"Gurugram, Haryana",products:"Millet Noodles, Millet Pancake Mix, Millet Dosa Mix, Millet Cookies, Ragi Power Drink, Ragi Porridge, Puffed Millet Snacks",types:["RTE","RTC","RTD"],platforms:["BigBasket","Blinkit","Zepto","Swiggy Instamart"]},
+  {sno:4,name:"ITC Ltd.",hq:"Kolkata, West Bengal",products:"Multi Millet Mix with Quinoa, Multi-Millet Atta, Ragi Flour, Multi-Grain Atta with Millet",types:["RTC"],platforms:["BigBasket","Blinkit","Zepto","Swiggy Instamart","JioMart"]},
+  {sno:5,name:"Mehrotra Consumer Products (Tattva)",hq:"Moradabad, Uttar Pradesh",products:"Organic Foxtail Millet, Kodo Millet, Barnyard Millet, Ragi Flour, Ragi Dosa Mix, Pearl Millet, Jowar Flour, Little Millet",types:["RTC"],platforms:["BigBasket","Blinkit","Zepto","Swiggy Instamart"]},
+  {sno:6,name:"Safe Harvest",hq:"JP Nagar, Bengaluru, Karnataka",products:"Little Millet, Barnyard Millet Rice, Foxtail Millet, Kodo Millet, Finger Millet (Ragi), Pearl Millet, Brown Top Millet",types:["RTC"],platforms:["BigBasket","Blinkit","Zepto"]},
+  {sno:7,name:"True Elements Foods",hq:"Pune, Maharashtra",products:"Raw Millets (Foxtail/Kodo/Barnyard/Little/Finger), Millet Muesli, Multi-Millet Trail Mix, Puffed Jowar, Ragi Flour, Jowar Flour",types:["RTC"],platforms:["BigBasket","Blinkit","Zepto","Swiggy Instamart"]},
+  {sno:8,name:"Manna Health Products",hq:"Hyderabad, Telangana",products:"Multi-Millet Atta, Ragi Flour, Jowar Flour, Bajra Flour, Millet Dalia, Millet Noodles, Multi-Millet Upma Mix, Millet Rava",types:["RTC"],platforms:["BigBasket","Blinkit","Zepto","Swiggy Instamart","JioMart"]},
+  {sno:9,name:"Britannia Industries",hq:"Kolkata / Bengaluru",products:"Britannia Millet Bread (21% millets – Bajra, Kodo, Jowar, Ragi, Foxtail blend)",types:["RTC"],platforms:["BigBasket","Blinkit","Zepto","Swiggy Instamart"]},
+  {sno:10,name:"Popular Essentials Inc.",hq:"Yeshwanthpur, Bengaluru, Karnataka",products:"Barnyard, Foxtail, Kodo, Little, Brown Top, Pearl, Finger Millet",types:["RTC"],platforms:["Zepto","BigBasket"]},
+  {sno:11,name:"Adani Wilmar (Fortune)",hq:"Ahmedabad, Gujarat",products:"Fortune Multi Millet Atta, Fortune Ragi Flour, Fortune Bajra Flour, Fortune Jowar Flour",types:["RTC"],platforms:["BigBasket","Blinkit","Zepto","Swiggy Instamart","JioMart"]},
+  {sno:12,name:"Wholsum Foods (Millé Supergrain)",hq:"Paschim Vihar, West Delhi",products:"Millet Pancake Mix, Whole Grain Millet Pack, Millet Flakes, Millet Pasta, Millet Energy Bars, Foxtail Millet Grain",types:["RTE","RTC"],platforms:["BigBasket","Blinkit","Amazon","Swiggy Instamart"]},
+  {sno:13,name:"Lo! Foods (MindfulNutri)",hq:"Bengaluru, Karnataka",products:"Gluten-Free Multi Millet Atta, Butter Millet Cookies, Millet Chips, Jowar Cookies, Lo-Carb Millet Flour Blend",types:["RTE","RTC"],platforms:["Blinkit","Zepto","Swiggy Instamart","BigBasket"]},
+  {sno:14,name:"Snackible",hq:"Mumbai, Maharashtra",products:"Ragi Chips, Jowar Chips, Jowar Puffs, Multigrain Millet Snacks, Ragi Chatpata Crunch",types:["RTE","RTC"],platforms:["Blinkit","Zepto","Swiggy Instamart","BigBasket"]},
+  {sno:15,name:"Dhatu Organics & Naturals",hq:"Bengaluru, Karnataka",products:"Organic Finger Millet Flour, Organic Foxtail/Kodo/Little Millet, Sprouted Ragi Flour, Ragi Porridge Mix, Multi-Grain Millet Mix",types:["RTC"],platforms:["BigBasket","Swiggy Instamart"]},
+  {sno:16,name:"The Millet Company",hq:"Bengaluru, Karnataka",products:"Unpolished Millet Combo (5 SiriDhanya), Jowar Flour, Pre-Soaked Millet Flour Combo Pack, Millet Rava",types:["RTC"],platforms:["Blinkit","Zepto"]},
+  {sno:17,name:"Eat Better Co.",hq:"Bengaluru, Karnataka",products:"Chatpata Millet Mixture, Millet Puffs, Jowar Puffs, Multi-Millet Snack Mix, Millet Trail Mix",types:["RTE","RTC"],platforms:["Blinkit","BigBasket","Zepto"]},
+  {sno:18,name:"Nourish You",hq:"Hyderabad, Telangana",products:"Plant-Based Millet Milk (Ragi+Jowar+Bajra+Oats), Millet Smoothie Base, Millet Nutrition Drink",types:["RTC","RTD"],platforms:["Zepto","Swiggy Instamart"]},
+  {sno:19,name:"Sabala Millets",hq:"Hyderabad, Telangana",products:"Millet Upma Mix, Millet Khichdi Mix, Millet Pulao Mix, Millet Idli Mix, Millet Dosa Mix, Millet Porridge Mix",types:["RTC"],platforms:["Swiggy Instamart","D2C"]},
+  {sno:20,name:"Bhagyanagar Foods",hq:"Hastinapuram, Hyderabad, Telangana",products:"Multi-Millet Rava (VSR brand), Multi-Millet Upma Mix",types:["RTC"],platforms:["BigBasket"]},
+  {sno:21,name:"Sri Aharya",hq:"Hyderabad, Telangana",products:"Millets Idli Ravva, Millet Upma Mix, Multi-Millet Rava",types:["RTC"],platforms:["BigBasket"]},
+  {sno:22,name:"Millet Marvels / Aakruthi Agricultural Group",hq:"Hyderabad, Telangana",products:"Raw Millets (Foxtail/Kodo/Little/Barnyard/Browntop/Finger), Millet Flour, Millet Health Mix",types:["RTC"],platforms:["BigBasket"]},
+  {sno:25,name:"PragatiNatural",hq:"Telangana",products:"Organic Little Millets (Samalu), Foxtail Millet, Kodo Millet",types:["RTC"],platforms:["JioMart"]},
+  {sno:26,name:"HDC Siridhanya",hq:"South India",products:"5 Positive Millets Combo Unpolished & Organic (Little/Foxtail/Kodo/Barnyard/Browntop)",types:["RTC"],platforms:["JioMart"]},
+  {sno:27,name:"TruNaturals",hq:"Bengaluru, Karnataka",products:"Siridhanya Millets Unpolished Combo 5kg (Browntop/Barnyard/Foxtail/Kodo/Little)",types:["RTC"],platforms:["JioMart"]},
+  {sno:28,name:"Amwel Organic",hq:"Delhi NCR",products:"Little+Browntop+Barnyard Millet Combo, SiriDhanya Millet Combo, Kodo Millet, Foxtail Millet",types:["RTC"],platforms:["JioMart"]},
+  {sno:29,name:"Ram Gold Organics",hq:"Karnataka",products:"Energy Millet Morning Ambli (7-Millet Health Mix), Pearl Millet, Foxtail Millet",types:["RTC"],platforms:["JioMart"]},
+  {sno:30,name:"Laxmi Protein Products",hq:"Gujarat",products:"Pearl Millet (Desi Bajra / Whole Grain Bajra)",types:["RTC"],platforms:["JioMart"]},
+  {sno:31,name:"Arham Organic",hq:"Ahmedabad, Gujarat",products:"Ragi Millet Pasta (Macaroni)",types:["RTC"],platforms:["JioMart"]},
+  {sno:32,name:"Okhli Musal Brand",hq:"Jaipur, Rajasthan",products:"Barnyard Millet, Little Millet (Vari/Varai)",types:["RTC"],platforms:["JioMart"]},
+  {sno:33,name:"Humpy Farms",hq:"Karnataka",products:"Multi-Millet Mix Flour (9-millet blend: Jowar+Bajra+Ragi+Rajgira+Foxtail+Barnyard+Kodo+Little+Proso)",types:["RTC"],platforms:["Zepto"]},
+  {sno:34,name:"Bhagirathi Agro",hq:"Gujarat",products:"Little Millet Flour, Foxtail Millet, Proso Millet, Pearl Millet, Kodo Millet",types:["RTC"],platforms:["Zepto","BigBasket"]},
+  {sno:35,name:"Naturally Yours",hq:"Bengaluru, Karnataka",products:"Multi Millet Instant Noodles, Millet Flour, Millet Pasta",types:["RTC"],platforms:["BigBasket","Blinkit","Zepto"]},
+  {sno:36,name:"Two Brothers Organic Farms",hq:"Osmanabad, Maharashtra",products:"Organic Foxtail/Little/Kodo/Barnyard Millet, Millet Flour, Multi-Millet Pack",types:["RTC"],platforms:["BigBasket","Amazon"]},
+  {sno:37,name:"Jiwa Cold Pressed Attas",hq:"Chandigarh",products:"Organic Foxtail & Barnyard Millet, Ragi Flour (Cold-Pressed), Multi-Millet Cold-Pressed Atta",types:["RTC"],platforms:["BigBasket","Amazon"]},
+  {sno:38,name:"Jivamrit Organic",hq:"Noida, Uttar Pradesh",products:"Organic Millet Grains, Organic Ragi Flour, Organic Foxtail Millet",types:["RTC"],platforms:["BigBasket"]},
+  {sno:39,name:"Urban Platter",hq:"Mumbai, Maharashtra",products:"Foxtail Millet Flour, Kodo/Little/Barnyard Millet, Multi-Millet Flour, Jowar Flour, Bajra Flour, Ragi Flour",types:["RTC"],platforms:["BigBasket","Blinkit"]},
+  {sno:40,name:"Farmley",hq:"Delhi NCR",products:"Millet Trail Mix, Jowar Puffs, Multi-Millet Snack Mix, Puffed Jowar",types:["RTE","RTC"],platforms:["BigBasket","Blinkit"]},
+  {sno:41,name:"Millet Amma (Hamsika Food Products)",hq:"Mumbai / Bengaluru",products:"Nutty Millet Cookies, Bajra Methi Khakhra, Ragi Laddoo, Millet Lavash, Millet Pizza Base, Millet Dosa Mix, Millet Pasta",types:["RTE","RTC"],platforms:["BigBasket","Amazon","D2C"]},
+  {sno:42,name:"e-Millet",hq:"Madurai / Namakkal, Tamil Nadu",products:"Millet Noodles, Millet Cookies, Millet Rusk, Millet Chikki, Millet Snacks, Baby Mum Mum, Millet Pasta",types:["RTE","RTC"],platforms:["BigBasket","Amazon","D2C"]},
+  {sno:43,name:"Millet Bank (Vaana Agro Foods)",hq:"Banjara Hills, Hyderabad, Telangana",products:"Multi-Millet Instant Noodles, Millet Muesli, Millet Pasta, Millet Cookies (Golden Krunch), Millet Upma Mix, Millet Pongal Mix",types:["RTE","RTC"],platforms:["BigBasket","D2C"]},
+  {sno:46,name:"TrooGood (Humus Foods)",hq:"Bengaluru / Hyderabad",products:"Millet Chikki, Millet Parathas, Millet Snack Bars, Millet-based Bakery Snacks",types:["RTE","RTC"],platforms:["BigBasket","Blinkit","Zepto","Swiggy Instamart"]},
+  {sno:47,name:"Earthon",hq:"Ahmedabad, Gujarat",products:"Organic Foxtail/Kodo/Barnyard Millet, Organic Ragi, Organic Millet Flour",types:["RTC"],platforms:["BigBasket"]},
+  {sno:48,name:"SkyRoots",hq:"Kothrud, Pune, Maharashtra",products:"Foxtail/Little/Kodo/Barnyard Millet, Millet Combo Packs",types:["RTC"],platforms:["BigBasket"]},
+  {sno:49,name:"Me & Millets",hq:"HSR Layout, Bengaluru, Karnataka",products:"Millet Flour, Millet Snacks, Multi-Millet Mix, Millet Breakfast Cereal",types:["RTE","RTC"],platforms:["BigBasket"]},
+  {sno:50,name:"Mill-it",hq:"Jaipur, Rajasthan",products:"Multi-Millet Mix, Millet Flour Blend, Millet Atta",types:["RTC"],platforms:["BigBasket"]},
+  {sno:51,name:"7Millets (Malgudi Foods)",hq:"Indiranagar, Bengaluru, Karnataka",products:"7-Millet Combo Pack, Individual Millets (7 varieties), Millet Flour, Multi-Millet Health Mix",types:["RTC"],platforms:["BigBasket"]},
+  {sno:52,name:"EatMillet (Sproutlife Foods)",hq:"Goregaon West, Mumbai, Maharashtra",products:"Little Millet Upma Rava, Multi-Millet Idli Mix, Crispy Millet Mixture Snack, Millet Pasta",types:["RTE","RTC"],platforms:["BigBasket","Amazon"]},
+  {sno:53,name:"Deccanmudra",hq:"Hyderabad, Telangana",products:"Foxtail/Kodo/Barnyard/Little Millet, Ragi, Jowar, Bajra (raw grains & flour)",types:["RTC"],platforms:["BigBasket"]},
+  {sno:54,name:"Graminway (B&G Foods)",hq:"Sector 58, Noida, Uttar Pradesh",products:"Millet Flour, Multi-Millet Mix, Raw Millets",types:["RTC"],platforms:["BigBasket"]},
+  {sno:55,name:"Gramiyum",hq:"South India",products:"Foxtail/Little/Kodo/Barnyard Millet (raw & flour)",types:["RTC"],platforms:["BigBasket"]},
+  {sno:56,name:"Bliss Tree",hq:"Coimbatore, Tamil Nadu",products:"Organic Millets (Foxtail/Little/Kodo/Barnyard), Millet Flour",types:["RTC"],platforms:["BigBasket"]},
+  {sno:57,name:"Conscious Food",hq:"Mumbai, Maharashtra",products:"Organic Foxtail/Little Millet, Organic Ragi Flour, Organic Jowar",types:["RTC"],platforms:["BigBasket"]},
+  {sno:58,name:"Pro Nature Organic Foods",hq:"Bengaluru, Karnataka",products:"Organic Foxtail/Little/Ragi/Jowar/Bajra/Kodo Millet, Ragi Flour",types:["RTC"],platforms:["BigBasket","Amazon"]},
+  {sno:59,name:"Just Organik",hq:"Delhi NCR",products:"Organic Foxtail/Finger/Pearl/Kodo Millet",types:["RTC"],platforms:["BigBasket","Amazon"]},
+  {sno:60,name:"Phalada Pure & Sure",hq:"Bengaluru, Karnataka",products:"Organic Ragi/Foxtail/Little/Barnyard Millet, Ragi Flour",types:["RTC"],platforms:["BigBasket"]},
+  {sno:61,name:"Earthspired (Adidev Herbals)",hq:"Mohali, Punjab",products:"Organic Millets (Foxtail/Kodo/Little/Barnyard), Multi-Millet Combo",types:["RTC"],platforms:["BigBasket"]},
+  {sno:62,name:"Farmveda",hq:"Okhla Phase-I, New Delhi",products:"Millet Flour, Raw Millets, Multi-Millet Mix",types:["RTC"],platforms:["BigBasket"]},
+  {sno:63,name:"Snackary",hq:"Janakpuri, New Delhi",products:"Millet-based Snacks (Jowar Puffs, Ragi Crispies)",types:["RTE","RTC"],platforms:["BigBasket"]},
+  {sno:64,name:"Niraparana",hq:"South India",products:"Organic Millet (Foxtail/Little/Ragi/Jowar), Millet Flour",types:["RTC"],platforms:["BigBasket"]},
+  {sno:65,name:"Double Horse (AVT McCormick)",hq:"Kochi, Kerala",products:"Ragi Flour, Jowar Flour, Bajra Flour, Multi-Millet Atta, Ragi Porridge Mix",types:["RTC"],platforms:["BigBasket","Blinkit","Zepto"]},
+  {sno:66,name:"Timios",hq:"Bengaluru, Karnataka",products:"Ragi Millet Cookies (kids), Millet Porridge, Multi-Millet Baby Cereal, Ragi Pancake Mix",types:["RTE","RTC"],platforms:["BigBasket","Blinkit","Amazon"]},
+  {sno:67,name:"Whole Farm Organics",hq:"Ahmedabad, Gujarat",products:"Premium Rice Flour, Ragi Flour, Jowar Flour, Bajra Flour",types:["RTC"],platforms:["Blinkit"]},
+  {sno:68,name:"Better Nutrition",hq:"Magarpatta City, Pune, Maharashtra",products:"Ragi Flour, Multi-Millet Flour Blend",types:["RTC"],platforms:["Blinkit"]},
+  {sno:69,name:"Nourish Organics / Nourish You",hq:"Hyderabad, Telangana",products:"Millet Milk (Rajgira+Oats+Sprouted Ragi+Sprouted Jowar), Millet Smoothie Drink",types:["RTD"],platforms:["Zepto","Swiggy Instamart"]},
+  {sno:70,name:"Sprouvita (Nirlep Appliances)",hq:"Aurangabad, Maharashtra",products:"Sprouted Ragi Flour, Sprouted Millet Flour, Sprouted Multi-Millet Mix",types:["RTC"],platforms:["BigBasket"]},
+  {sno:71,name:"Ganesh Flour Mills",hq:"South India / Karnataka",products:"Finger Millet (Ragi) Atta – stone-ground",types:["RTC"],platforms:["BigBasket"]},
+  {sno:72,name:"EVAA Naturals",hq:"Koramangala, Bengaluru, Karnataka",products:"Organic Millet Grains (Foxtail/Barnyard/Kodo/Little), Millet Flour",types:["RTC"],platforms:["BigBasket"]},
+  {sno:73,name:"Pansari Group",hq:"Delhi NCR",products:"Ragi Flour, Bajra Flour, Jowar Flour, Multi-Millet Atta Blend",types:["RTC"],platforms:["Blinkit","BigBasket"]},
+  {sno:74,name:"Nutty Yogi",hq:"Noida, Uttar Pradesh",products:"Millet Flour Blends, Multi-Millet Health Mix, Ragi Ladoo, Millet Granola, Millet Trail Mix",types:["RTC"],platforms:["BigBasket","Amazon"]},
+  {sno:75,name:"Open Secret",hq:"Bengaluru, Karnataka",products:"Millet-based Cookies (Jowar/Ragi), Millet Chikki, Multi-Grain Millet Snack Bars",types:["RTE","RTC"],platforms:["BigBasket","Blinkit","Zepto"]},
+  {sno:76,name:"Tata Sampann",hq:"Mumbai / Bengaluru",products:"Multi-Grain Atta with Millet, Ragi Flour, Multi-Millet Mix",types:["RTC"],platforms:["BigBasket","Blinkit","Zepto","Swiggy Instamart"]},
+  {sno:77,name:"Natureland Organics",hq:"Delhi NCR",products:"Organic Foxtail/Kodo/Little Millet, Organic Ragi Flour, Organic Jowar",types:["RTC"],platforms:["BigBasket","Amazon"]},
+  {sno:78,name:"Desi Nuts",hq:"Karol Bagh, New Delhi",products:"Millet Mix Snack, Puffed Jowar, Multi-Millet Trail Mix",types:["RTE","RTC"],platforms:["BigBasket"]},
+  {sno:79,name:"Millé Supergrain (Wholsum)",hq:"Paschim Vihar, West Delhi",products:"Millet Pancake Mix, Foxtail Millet Grain, Millet Oats Flakes, Millet Pasta, Millet Energy Balls",types:["RTC"],platforms:["Swiggy Instamart","Amazon","BigBasket"]},
+  {sno:80,name:"Vedaka (Amazon)",hq:"Bengaluru, Karnataka",products:"Finger Millet (Ragi), Foxtail, Jowar, Pearl, Little, Barnyard Millet",types:["RTC"],platforms:["Amazon","BigBasket"]},
+  {sno:81,name:"Slurrp Farm",hq:"New Delhi, Delhi",products:"Millet Noodles, Millet Pancake Mix, Millet Cookies, Millet Biscuits, Millet Dosa Mix, Millet Pasta, Millet Porridge",types:["RTE","RTC"],platforms:["BigBasket","Amazon","Swiggy Instamart"]},
+  {sno:82,name:"True Elements",hq:"Hinjewadi, Maharashtra",products:"Millet Mix, Millet Chikki, Millet Shake, Millet Muesli, Millet Granola, Millet Pancake Mix, Millet Hot Chocolate",types:["RTE","RTC","RTD"],platforms:["Amazon","BigBasket","D2C"]},
+  {sno:83,name:"Tummy Friendly Foods",hq:"Bengaluru, Karnataka",products:"Millet Cookies (Coconut, Chocolate, Ragi variants)",types:["RTE"],platforms:["Swiggy Instamart"]},
+  {sno:84,name:"Early Foods",hq:"Lohegaon, Pune, Maharashtra",products:"Multi-Grain Millet Jaggery Cookies",types:["RTE"],platforms:["BigBasket","Swiggy Instamart"]},
+  {sno:85,name:"Lo! Foods (Bajo Foods)",hq:"Bengaluru, Karnataka",products:"Gluten Free Millet Ragi Chips, Butter Millet Cookies",types:["RTE"],platforms:["Blinkit","Swiggy Instamart","Zepto"]},
+  {sno:86,name:"Kiru Millet",hq:"BTM Layout, Bengaluru, Karnataka",products:"Millet Cookies (Cashew/Chocochip/Butter & Nuts), Millet Crunchies, Millet Peanut Chikkis",types:["RTE"],platforms:["D2C"]},
+  {sno:87,name:"Diabliss",hq:"Chennai, Tamil Nadu",products:"Millet Cookies with Moringa Leaf",types:["RTE"],platforms:["BigBasket"]},
+  {sno:88,name:"Britannia NutriChoice",hq:"Whitefield, Bengaluru, Karnataka",products:"Millets Cookies",types:["RTE"],platforms:["Blinkit","Zepto","BigBasket"]},
+  {sno:89,name:"Sabala Millets (Ramoji Group)",hq:"Hyderabad, Telangana",products:"Millet Cookies, Millet Meal Bars, Millet Protein Bars",types:["RTE"],platforms:["Zepto"]},
+  {sno:90,name:"Raman Greens (AISECT Group)",hq:"Bhopal, Madhya Pradesh",products:"Millet Cookies, Millet Snacks",types:["RTE"],platforms:["BigBasket","Blinkit","Zepto"]},
+  {sno:91,name:"Natures Quest",hq:"Hyderabad, Telangana",products:"Foxtail Millet, White Jowar",types:[],platforms:["BigBasket"]},
+  {sno:92,name:"Gladful",hq:"Jaipur, Rajasthan",products:"Pancake Mix, Chilla, Dosa Mix",types:["RTC"],platforms:["BigBasket","Blinkit","Zepto","Swiggy Instamart"]},
+  {sno:93,name:"Parry's (E.I.D. Parry)",hq:"Chennai, Tamil Nadu",products:"Kodo, Barnyard, Foxtail Millets",types:[],platforms:["BigBasket","Blinkit","Zepto","Swiggy Instamart"]},
+  {sno:95,name:"BB Royal Organics",hq:"Bangalore, Karnataka",products:"Organic Millets, Flours",types:[],platforms:["BigBasket"]},
+  {sno:96,name:"Phab",hq:"Mumbai, Maharashtra",products:"Protein Bombs, Energy Bars, Milkshakes",types:["RTE","RTD"],platforms:["BigBasket","Blinkit","Zepto"]},
+  {sno:97,name:"Rite Bite (Zydus Wellness)",hq:"Ahmedabad, Gujarat",products:"Max Protein Chips, Bars, Cookies",types:["RTE"],platforms:["BigBasket","Blinkit","Zepto","Swiggy Instamart"]},
+  {sno:98,name:"Let's Try (Earth Crust)",hq:"Delhi NCR",products:"Baked Millet Puffs, Baked Millet Bhujia",types:["RTE"],platforms:["BigBasket","Blinkit","Zepto","Swiggy Instamart"]},
+  {sno:99,name:"Troovy",hq:"Gurgaon, Haryana",products:"High Protein Millet Vermicelli",types:["RTC"],platforms:["BigBasket","Blinkit","Zepto","Swiggy Instamart"]},
+  {sno:100,name:"BB Gooddiet",hq:"Bangalore, Karnataka",products:"Millet Upma, Multi Millet Flakes, Kodo Millet Rava Dosa",types:["RTE","RTC"],platforms:["BigBasket"]},
+  {sno:101,name:"Tots and Moms",hq:"Bangalore, Karnataka",products:"Instant Mixes, Cereals, Porridges, Millet Cookies",types:["RTE","RTC"],platforms:["BigBasket","Blinkit","Zepto","Swiggy Instamart"]},
+  {sno:102,name:"Millets and More",hq:"Chennai, Tamil Nadu",products:"Millet products, Quinoa",types:[],platforms:["BigBasket","Blinkit","Zepto","Swiggy Instamart"]},
+  {sno:103,name:"Madmix (Eatmadmix)",hq:"Sakinaka, Mumbai, Maharashtra",products:"Baked Millet Puffs, Baked Millet Bhujia",types:["RTE"],platforms:["BigBasket","Blinkit","Zepto","Swiggy Instamart"]},
+  {sno:104,name:"The Healthy Binge",hq:"Khed Shivapur, Pune",products:"100% Baked Millet Chips",types:["RTE"],platforms:["BigBasket","Blinkit","Zepto","Swiggy Instamart"]},
+  {sno:105,name:"True Story Organics",hq:"Rajkot, Gujarat",products:"Organic Millets, Jowar Atta",types:[],platforms:["BigBasket","Blinkit","Zepto","Swiggy Instamart"]},
+  {sno:106,name:"Super Saver",hq:"Bangalore, Karnataka",products:"Ragi Whole, Bajra, Little Millet, Jowar, Kodo Millet",types:[],platforms:["BigBasket","Blinkit","Zepto","Swiggy Instamart"]},
+  {sno:107,name:"Jus Amazin",hq:"Indiranagar, Bangalore, Karnataka",products:"Nut Butters, Healthy Snacks",types:["RTE"],platforms:["BigBasket","Blinkit","Zepto","Swiggy Instamart"]},
+  {sno:108,name:"BB Popular",hq:"Bangalore, Karnataka",products:"Ragi/Raglu, Staples",types:[],platforms:["BigBasket","Blinkit","Zepto","Swiggy Instamart"]},
+  {sno:109,name:"Crax (DFM Foods)",hq:"Noida, UP",products:"Corn Rings, Snacks",types:["RTE"],platforms:["BigBasket","Blinkit","Zepto","Swiggy Instamart"]},
+  {sno:110,name:"Snutzy",hq:"Delhi NCR",products:"Ragi Chips, Choco Chip Cookies",types:["RTE"],platforms:["BigBasket","Blinkit","Zepto","Swiggy Instamart"]},
+  {sno:111,name:"Twirtles (Deccan Food Ventures)",hq:"Delhi NCR",products:"Baked snacks",types:["RTE"],platforms:["BigBasket","Blinkit","Zepto","Swiggy Instamart"]},
+  {sno:112,name:"Satvikveda",hq:"Bhavnagar, Gujarat",products:"Organic Millets",types:[],platforms:["BigBasket","Blinkit","Zepto","Swiggy Instamart"]},
+  {sno:113,name:"Jaggic",hq:"Chandigarh",products:"Jaggery and Millet blends",types:["RTE"],platforms:["BigBasket","Blinkit","Zepto","Swiggy Instamart"]},
+  {sno:114,name:"Right Shift (ITC)",hq:"Kolkata, West Bengal",products:"Atta, Cookie, Oats",types:["RTE","RTC"],platforms:["BigBasket","Blinkit","Zepto","Swiggy Instamart"]},
+  {sno:115,name:"Vijay (Saroj Agro)",hq:"Gangavathi, Karnataka",products:"Ragi Flour, Raw Millets",types:[],platforms:["BigBasket","Blinkit","Zepto","Swiggy Instamart"]},
+  {sno:117,name:"Heritage Foods",hq:"Hyderabad, Telangana",products:"Millets",types:[],platforms:["BigBasket","Blinkit","Zepto","Swiggy Instamart"]},
+  {sno:120,name:"Organic Wisdom",hq:"Ghatkopar West, Mumbai",products:"Organic Millets",types:[],platforms:["BigBasket","Blinkit","Zepto","Swiggy Instamart"]},
+  {sno:121,name:"Daily Good",hq:"Sector 8, Noida, Uttar Pradesh",products:"Millets",types:[],platforms:["Zepto"]},
+  {sno:123,name:"Javapa / Tango Store",hq:"Mumbai, Maharashtra",products:"Rice Noodles",types:["RTC"],platforms:["BigBasket","Blinkit","Zepto","Swiggy Instamart"]},
+  {sno:124,name:"Heka Bites",hq:"Mumbai, Maharashtra",products:"Healthy Snacks",types:["RTE"],platforms:["BigBasket","Blinkit","Zepto","Swiggy Instamart"]},
+  {sno:125,name:"Cookieman (Australian Foods India)",hq:"Ambattur, Chennai, Tamil Nadu",products:"Millet Jaggery Cookies, Sugar Free Multigrain Cookies",types:["RTE"],platforms:["BigBasket","Blinkit","Zepto","Swiggy Instamart"]},
+  {sno:126,name:"Supreme Harvest",hq:"Bangalore, Karnataka",products:"Raw Millets, Sabudana",types:[],platforms:["BigBasket","Blinkit","Zepto","Swiggy Instamart"]},
+  {sno:127,name:"Milletio",hq:"Chamundeshwari Layout, Bangalore",products:"Organic Millets",types:[],platforms:["BigBasket","Blinkit","Zepto","Swiggy Instamart"]},
+  {sno:128,name:"Organeekz (Greenmania)",hq:"Bhoganahalli, Bengaluru",products:"Organic Brown Top Millet, Samai, Brown Sugar",types:[],platforms:["Swiggy Instamart"]},
+  {sno:129,name:"Pusht Organic",hq:"Greater Noida, UP",products:"Organic Millets",types:[],platforms:["BigBasket","Blinkit","Zepto","Swiggy Instamart"]},
+  {sno:131,name:"Yummy Bee (Vlogs Food)",hq:"Madhapur, Hyderabad",products:"Low Calorie Millet Desserts",types:["RTE"],platforms:["BigBasket","Blinkit","Zepto","Swiggy Instamart"]}
+];
+
+const platClass = {
+  "BigBasket":"plat-bb","Blinkit":"plat-bk","Zepto":"plat-zp",
+  "Swiggy Instamart":"plat-si","JioMart":"plat-jm","Amazon":"plat-am","D2C":"plat-d2c"
+};
+
+function renderCard(b, delay) {
+  const typeTags = b.types.map(t => `<span class="tag tag-${t}">${t}</span>`).join('');
+  const platTags = b.platforms.map(p => `<span class="plat ${platClass[p]||''}">${p}</span>`).join('');
+  return `<div class="card" style="animation-delay:${delay}ms">
+    <div class="card-header">
+      <div class="brand-name">${b.name}</div>
+      <span class="sno">#${b.sno}</span>
+    </div>
+    <div class="hq">
+      <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+      ${b.hq}
+    </div>
+    <div class="products"><strong>Products</strong>${b.products}</div>
+    ${typeTags ? `<div class="tags">${typeTags}</div>` : ''}
+    <div class="platforms">${platTags}</div>
+  </div>`;
+}
+
+function filter() {
+  const q = document.getElementById('search').value.toLowerCase();
+  const plat = document.getElementById('platform').value;
+  const type = document.getElementById('type').value;
+  const results = brands.filter(b => {
+    const text = `${b.name} ${b.products} ${b.hq}`.toLowerCase();
+    const matchQ = !q || text.includes(q);
+    const matchP = !plat || b.platforms.some(p => p === plat || (plat === 'Amazon' && p.startsWith('Amazon')));
+    const matchT = !type || b.types.includes(type);
+    return matchQ && matchP && matchT;
+  });
+  const grid = document.getElementById('grid');
+  document.getElementById('countLabel').innerHTML = `Showing <strong>${results.length}</strong> of ${brands.length} brands`;
+  if (!results.length) {
+    grid.innerHTML = `<div class="no-results"><svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><p>No brands match your filters.</p></div>`;
+    return;
+  }
+  grid.innerHTML = results.map((b,i) => renderCard(b, Math.min(i*20,300))).join('');
+}
+
+filter();
+</script>
+</body>
+</html>
